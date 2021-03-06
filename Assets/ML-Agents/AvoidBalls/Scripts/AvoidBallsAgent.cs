@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using MLAgents;
 
-public class BasicAgent : Agent
+public class AvoidBallsAgent : Agent
 {
-    [Header("Specific to Basic")]
-    private BasicAcademy academy;
+    [Header("Specific to AvoidBalls")]
+    private AvoidBallsAcademy academy;
     public float timeBetweenDecisionsAtInference;
     private float timeSinceDecision;
     int position;
@@ -19,7 +19,7 @@ public class BasicAgent : Agent
 
     public override void InitializeAgent()
     {
-        academy = FindObjectOfType(typeof(BasicAcademy)) as BasicAcademy;
+        academy = FindObjectOfType(typeof(AvoidBallsAcademy)) as AvoidBallsAcademy;
     }
 
     public override void CollectObservations()

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MLAgents;
 
-public class BasicAcademy : Academy {
+public class AvoidBallsAcademy : Academy {
 
     public override void AcademyReset()
     {
