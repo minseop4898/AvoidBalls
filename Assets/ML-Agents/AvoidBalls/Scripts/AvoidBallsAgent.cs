@@ -5,104 +5,55 @@ using MLAgents;
 
 public class AvoidBallsAgent : Agent
 {
-    [Header("Specific to AvoidBalls")]
-    private AvoidBallsAcademy academy;
-    public float timeBetweenDecisionsAtInference;
-    private float timeSinceDecision;
-    int position;
-    int smallGoalPosition;
-    int largeGoalPosition;
-    public GameObject largeGoal;
-    public GameObject smallGoal;
-    int minPosition;
-    int maxPosition;
+    public GameObject ball;
+    public GameObject user;
+    ArrayList ballArray = new ArrayList();
 
     public override void InitializeAgent()
     {
-        academy = FindObjectOfType(typeof(AvoidBallsAcademy)) as AvoidBallsAcademy;
     }
 
     public override void CollectObservations()
     {
-        AddVectorObs(position, 20);
     }
 
     public override void AgentAction(float[] vectorAction, string textAction)
 	{
-        var movement = (int)vectorAction[0];
-	    
-		int direction = 0;
-	    
-		switch (movement)
-		{
-		    case 1:
-		        direction = -1;
-		        break;
-		    case 2:
-		        direction = 1;
-		        break;
-		}
-
-	    position += direction;
-        if (position < minPosition) { position = minPosition; }
-        if (position > maxPosition) { position = maxPosition; }
-
-        gameObject.transform.position = new Vector3(position - 10f, 0f, 0f);
-
-        AddReward(-0.01f);
-
-        if (position == smallGoalPosition)
+        if (vectorAction[0] == 5)
         {
-            Done();
-            AddReward(0.1f);
+            Vector3 userVelo = user.GetComponent<Rigidbody>().velocity;
+            Vector3 userPos = user.transform.position;
+            GameObject newBall = (GameObject)Instantiate(ball, userPos + userVelo, Quaternion.identity);
+            newBall.GetComponent<Rigidbody>().AddForce(userVelo);
         }
-
-        if (position == largeGoalPosition)
+        else
         {
-            Done();
-            AddReward(1f);
+            Vector3 direction = new Vector3(0f, 0f, 0f);
+            float velScale = 5f;
+            switch (vectorAction[0])
+            {
+                case 1:
+                    direction.x = -1f * velScale;
+                    break;
+                case 2:
+                    direction.z = -1f * velScale;
+                    break;
+                case 3:
+                    direction.x = 1f * velScale;
+                    break;
+                case 4:
+                    direction.z = 1f * velScale;
+                    break;
+            }
+            user.GetComponent<Rigidbody>().AddForce(direction);
         }
     }
 
     public override void AgentReset()
     {
-        position = 10;
-        minPosition = 0;
-        maxPosition = 20;
-        smallGoalPosition = 7;
-        largeGoalPosition = 17;
-        smallGoal.transform.position = new Vector3(smallGoalPosition - 10f, 0f, 0f);
-        largeGoal.transform.position = new Vector3(largeGoalPosition - 10f, 0f, 0f);
     }
 
     public override void AgentOnDone()
     {
-
     }
-
-    public void FixedUpdate()
-    {
-        WaitTimeInference();
-    }
-
-    private void WaitTimeInference()
-    {
-        if (!academy.GetIsInference())
-        {
-            RequestDecision();
-        }
-        else
-        {
-            if (timeSinceDecision >= timeBetweenDecisionsAtInference)
-            {
-                timeSinceDecision = 0f;
-                RequestDecision();
-            }
-            else
-            {
-                timeSinceDecision += Time.fixedDeltaTime;
-            }
-        }
-    }
-
 }
